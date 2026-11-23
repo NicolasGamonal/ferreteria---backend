@@ -1,6 +1,8 @@
 package duoc.cl.ferreteria.service;
 
+import duoc.cl.ferreteria.model.CuentaCorriente;
 import duoc.cl.ferreteria.model.Usuario;
+import duoc.cl.ferreteria.repository.CuentaCorrienteRepository;
 import duoc.cl.ferreteria.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,9 @@ public class UsuarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private CuentaCorrienteRepository cuentaCorrienteRepository;
 
     public List<Usuario> obtenerTodos() {
         return usuarioRepository.findAll();
@@ -32,7 +37,20 @@ public class UsuarioService {
         if (usuario.getActivo() == null) {
             usuario.setActivo(true);
         }
-        return usuarioRepository.save(usuario);
+
+        Usuario guardado = usuarioRepository.save(usuario);
+
+        // Crea automáticamente la cuenta corriente para cada cliente nuevo ($300.000 iniciales)
+        if ("Cliente".equalsIgnoreCase(guardado.getRol())) {
+            CuentaCorriente cc = new CuentaCorriente();
+            cc.setUsuario(guardado);
+            cc.setCreditoDisponible(300000.0);
+            cc.setSaldoPendiente(0.0);
+            cc.setSaldoVencido(0.0);
+            cuentaCorrienteRepository.save(cc);
+        }
+
+        return guardado;
     }
 
     public Optional<Usuario> login(String email, String password) {
@@ -66,6 +84,10 @@ public class UsuarioService {
     }
 
     public void eliminarUsuario(Long id) {
+        usuarioRepository.findById(id).ifPresent(u ->
+            cuentaCorrienteRepository.findByUsuarioEmail(u.getEmail())
+                .ifPresent(cc -> cuentaCorrienteRepository.delete(cc))
+        );
         usuarioRepository.deleteById(id);
     }
 }

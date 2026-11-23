@@ -28,48 +28,49 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        // 1. Usuarios de prueba (ADMIN, VENDEDOR, CLIENTE)
         if (usuarioRepository.count() == 0) {
             Usuario admin = new Usuario();
-            admin.setNombre("Don Juan (Administrador)");
-            admin.setEmail("admin@ferreteria.cl");
-            admin.setPassword("admin123");
-            admin.setRol("ADMIN");
+            admin.setNombre("Admin Principal");
+            admin.setEmail("admin@losmaestros.cl");
+            admin.setPassword("123");
+            admin.setRol("Administrador");
+            admin.setActivo(true);
 
             Usuario vendedor = new Usuario();
             vendedor.setNombre("Carlos Vendedor");
-            vendedor.setEmail("vendedor@ferreteria.cl");
-            vendedor.setPassword("vendedor123");
-            vendedor.setRol("VENDEDOR");
+            vendedor.setEmail("ventas@losmaestros.cl");
+            vendedor.setPassword("123");
+            vendedor.setRol("Vendedor");
+            vendedor.setActivo(true);
 
             Usuario cliente = new Usuario();
-            cliente.setNombre("Pedro Maestro Contratista");
-            cliente.setEmail("cliente@ferreteria.cl");
-            cliente.setPassword("cliente123");
-            cliente.setRol("CLIENTE");
+            cliente.setNombre("Juan Pérez");
+            cliente.setEmail("cliente@gmail.com");
+            cliente.setPassword("123");
+            cliente.setRol("Cliente");
+            cliente.setActivo(true);
 
             usuarioRepository.saveAll(List.of(admin, vendedor, cliente));
 
-            // 2. Cuenta corriente asociada al cliente contratista
+            // Cuenta corriente del cliente con el límite por defecto ($300.000)
             CuentaCorriente cc = new CuentaCorriente();
             cc.setUsuario(cliente);
-            cc.setCreditoDisponible(500000.0);
-            cc.setSaldoPendiente(125000.0);
+            cc.setCreditoDisponible(300000.0);
+            cc.setSaldoPendiente(0.0);
             cc.setSaldoVencido(0.0);
             cuentaCorrienteRepository.save(cc);
         }
 
-        // 3. Catálogo inicial con las imágenes de ferreteria-don-juan-react/public
         if (productoRepository.count() == 0) {
             productoRepository.saveAll(List.of(
-                crearProducto("HER-001", "Caja de Destornilladores", "Set de destornilladores de precisión y fuerza", "Herramientas", "/caja_destornillador.jpg", 14990.0, 25),
-                crearProducto("HER-002", "Cinta Métrica 5m", "Huincha de medir reforzada con freno", "Herramientas", "/cinta_metrica.jpg", 5990.0, 40),
-                crearProducto("HER-003", "Llave Ajustable 10\"", "Llave francesa de acero cromado", "Herramientas", "/llave_ajustable.jpg", 9490.0, 18),
-                crearProducto("HER-004", "Nivel de Burbuja 60cm", "Nivel de aluminio para obra gruesa y terminaciones", "Herramientas", "/nivel_de_burbuja.jpg", 11990.0, 12),
-                crearProducto("HER-005", "Tijeras de Corte Lata", "Tijera hojalatera mango ergonómico", "Herramientas", "/tijeras_de_corte.jpg", 8990.0, 4),
-                crearProducto("MAT-001", "Saco de Cemento 25kg", "Cemento especial de alta resistencia para construcción", "Materiales", "/saco_de_cemento_de.jpg", 4890.0, 120),
-                crearProducto("MAT-002", "Saco de Arena Fina 25kg", "Arena fina tamizada para estuco y mortero", "Materiales", "/saco_de_arena_fina.jpg", 3290.0, 80),
-                crearProducto("MAT-003", "Ladrillo de Arcilla Fiscal", "Ladrillo estructural de arcilla cocida", "Materiales", "/ladrillo_de_arcilla.jpg", 650.0, 500)
+                crearProducto("LLA-001", "Llave Ajustable", "Llave ajustable de acero.", "Herramientas Manuales", "/llave_ajustable.jpg", 8590.0, 19),
+                crearProducto("CIN-001", "Cinta Métrica", "Cinta métrica de 5 metros.", "Herramientas Manuales", "/cinta_metrica.jpg", 4990.0, 15),
+                crearProducto("NIV-001", "Nivel de Burbuja", "Nivel de burbuja de aluminio.", "Herramientas Manuales", "/nivel_de_burbuja.jpg", 6990.0, 12),
+                crearProducto("DES-001", "Set de Destornilladores", "Set de 6 destornilladores.", "Herramientas Manuales", "/caja_destornillador.jpg", 12990.0, 8),
+                crearProducto("TIJ-001", "Tijeras de Corte", "Tijeras para hojalata.", "Herramientas Manuales", "/tijeras_de_corte.jpg", 8990.0, 6),
+                crearProducto("MAT-001", "Cemento 25kg", "Saco de cemento de 25 kg.", "Materiales de Construcción", "/saco_de_cemento_de.jpg", 7990.0, 49),
+                crearProducto("MAT-002", "Arena Fina (saco)", "Saco de arena fina.", "Materiales de Construcción", "/saco_de_arena_fina.jpg", 4990.0, 30),
+                crearProducto("MAT-003", "Ladrillo de arcilla", "Ladrillo de arcilla.", "Materiales de Construcción", "/ladrillo_de_arcilla.jpg", 350.0, 500)
             ));
         }
     }
@@ -84,6 +85,7 @@ public class DataInitializer implements CommandLineRunner {
         p.setImagen(imagen);
         p.setPrecio(precio);
         p.setStock(stock);
+        p.setStockMinimo(5);
         return p;
     }
 }
