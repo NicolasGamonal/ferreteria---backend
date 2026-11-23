@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/productos")
+@RequestMapping("/api/v1/productos")
 @CrossOrigin(origins = "*") // Permite la comunicación con el Frontend
 public class ProductoController {
 
@@ -26,6 +26,11 @@ public class ProductoController {
         return productoService.obtenerPorId(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/stock-bajo")
+    public List<Producto> listarStockBajo() {
+        return productoService.obtenerStockBajo();
     }
 
     @PostMapping

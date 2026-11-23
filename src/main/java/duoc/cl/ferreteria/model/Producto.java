@@ -5,11 +5,11 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "productos")
 public class Producto {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     private String codigo;
     private String nombre;
     private String descripcion;
@@ -17,6 +17,7 @@ public class Producto {
     private String imagen;
     private Double precio;
     private Integer stock;
+    private Integer stockMinimo = 5;
 
     // Getters y Setters
     public Long getId() { return id; }
@@ -42,4 +43,7 @@ public class Producto {
 
     public Integer getStock() { return stock; }
     public void setStock(Integer stock) { this.stock = stock; }
+
+    public Integer getStockMinimo() { return stockMinimo; }
+    public void setStockMinimo(Integer stockMinimo) { this.stockMinimo = stockMinimo; }
 }

@@ -18,6 +18,7 @@ public class Usuario {
 
     private String nombre;
     private String rol;
+    private Boolean activo = true;
 
     // Getters y Setters
     public Long getId() { return id; }
@@ -34,4 +35,7 @@ public class Usuario {
 
     public String getRol() { return rol; }
     public void setRol(String rol) { this.rol = rol; }
+
+    public Boolean getActivo() { return activo; }
+    public void setActivo(Boolean activo) { this.activo = activo; }
 }

@@ -14,34 +14,44 @@ public class ProductoService {
     @Autowired
     private ProductoRepository productoRepository;
 
-    // Lectura (Todos)
     public List<Producto> obtenerTodos() {
         return productoRepository.findAll();
     }
 
-    // Lectura (Por ID)
     public Optional<Producto> obtenerPorId(Long id) {
         return productoRepository.findById(id);
     }
 
-    // Creación
+    // Alerta de reposición: productos cuyo stock llegó al mínimo
+    public List<Producto> obtenerStockBajo() {
+        return productoRepository.findAll().stream()
+                .filter(p -> p.getStock() != null && p.getStock() <= (p.getStockMinimo() != null ? p.getStockMinimo() : 5))
+                .toList();
+    }
+
     public Producto guardarProducto(Producto producto) {
-        // Aquí podrías agregar validaciones de negocio (ej. stock mayor a 0)
+        if (producto.getStockMinimo() == null) {
+            producto.setStockMinimo(5);
+        }
         return productoRepository.save(producto);
     }
 
-    // Actualización
     public Producto actualizarProducto(Long id, Producto productoDetalles) {
         return productoRepository.findById(id).map(producto -> {
+            producto.setCodigo(productoDetalles.getCodigo());
             producto.setNombre(productoDetalles.getNombre());
             producto.setDescripcion(productoDetalles.getDescripcion());
+            producto.setCategoria(productoDetalles.getCategoria());
+            producto.setImagen(productoDetalles.getImagen());
             producto.setPrecio(productoDetalles.getPrecio());
             producto.setStock(productoDetalles.getStock());
+            if (productoDetalles.getStockMinimo() != null) {
+                producto.setStockMinimo(productoDetalles.getStockMinimo());
+            }
             return productoRepository.save(producto);
         }).orElseThrow(() -> new RuntimeException("Producto no encontrado"));
     }
 
-    // Eliminación
     public void eliminarProducto(Long id) {
         productoRepository.deleteById(id);
     }

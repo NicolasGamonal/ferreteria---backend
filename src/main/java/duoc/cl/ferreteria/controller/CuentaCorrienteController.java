@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/cuentas-corrientes")
+@RequestMapping("/api/v1/cuentas-corrientes")
 @CrossOrigin(origins = "*")
 public class CuentaCorrienteController {
 

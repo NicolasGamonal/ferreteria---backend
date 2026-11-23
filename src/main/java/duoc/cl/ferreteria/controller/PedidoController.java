@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/pedidos")
+@RequestMapping("/api/v1/pedidos")
 @CrossOrigin(origins = "*")
 public class PedidoController {
 
@@ -25,6 +25,19 @@ public class PedidoController {
     @GetMapping("/cliente/{email}")
     public List<Pedido> listarPedidosPorCliente(@PathVariable String email) {
         return pedidoService.obtenerPorEmail(email);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Pedido> obtenerPedido(@PathVariable Long id) {
+        return pedidoService.obtenerPorId(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarPedido(@PathVariable Long id) {
+        pedidoService.eliminarPedido(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping

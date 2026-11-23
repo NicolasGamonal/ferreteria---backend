@@ -18,6 +18,10 @@ public class UsuarioService {
         return usuarioRepository.findAll();
     }
 
+    public Optional<Usuario> obtenerPorId(Long id) {
+        return usuarioRepository.findById(id);
+    }
+
     public Usuario registrar(Usuario usuario) {
         if (usuarioRepository.findByEmail(usuario.getEmail()).isPresent()) {
             throw new RuntimeException("El correo ya está registrado");
@@ -25,11 +29,43 @@ public class UsuarioService {
         if (usuario.getRol() == null || usuario.getRol().isEmpty()) {
             usuario.setRol("Cliente");
         }
+        if (usuario.getActivo() == null) {
+            usuario.setActivo(true);
+        }
         return usuarioRepository.save(usuario);
     }
 
     public Optional<Usuario> login(String email, String password) {
         return usuarioRepository.findByEmail(email)
-                .filter(u -> u.getPassword().equals(password));
+                .filter(u -> u.getPassword().equals(password))
+                .filter(u -> u.getActivo() == null || u.getActivo());
+    }
+
+    public Usuario actualizarUsuario(Long id, Usuario detalles) {
+        return usuarioRepository.findById(id).map(u -> {
+            u.setNombre(detalles.getNombre());
+            u.setEmail(detalles.getEmail());
+            if (detalles.getPassword() != null && !detalles.getPassword().isEmpty()) {
+                u.setPassword(detalles.getPassword());
+            }
+            if (detalles.getRol() != null) {
+                u.setRol(detalles.getRol());
+            }
+            if (detalles.getActivo() != null) {
+                u.setActivo(detalles.getActivo());
+            }
+            return usuarioRepository.save(u);
+        }).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    }
+
+    public Usuario cambiarEstadoActivo(Long id, Boolean activo) {
+        return usuarioRepository.findById(id).map(u -> {
+            u.setActivo(activo);
+            return usuarioRepository.save(u);
+        }).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    }
+
+    public void eliminarUsuario(Long id) {
+        usuarioRepository.deleteById(id);
     }
 }
