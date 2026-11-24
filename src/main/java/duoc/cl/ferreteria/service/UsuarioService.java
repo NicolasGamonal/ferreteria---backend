@@ -5,6 +5,7 @@ import duoc.cl.ferreteria.model.Usuario;
 import duoc.cl.ferreteria.repository.CuentaCorrienteRepository;
 import duoc.cl.ferreteria.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +19,9 @@ public class UsuarioService {
 
     @Autowired
     private CuentaCorrienteRepository cuentaCorrienteRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public List<Usuario> obtenerTodos() {
         return usuarioRepository.findAll();
@@ -38,6 +42,9 @@ public class UsuarioService {
             usuario.setActivo(true);
         }
 
+        // Encriptación segura de la contraseña con BCrypt
+        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+
         Usuario guardado = usuarioRepository.save(usuario);
 
         // Crea automáticamente la cuenta corriente para cada cliente nuevo ($300.000 iniciales)
@@ -55,7 +62,7 @@ public class UsuarioService {
 
     public Optional<Usuario> login(String email, String password) {
         return usuarioRepository.findByEmail(email)
-                .filter(u -> u.getPassword().equals(password))
+                .filter(u -> passwordEncoder.matches(password, u.getPassword()))
                 .filter(u -> u.getActivo() == null || u.getActivo());
     }
 
@@ -64,7 +71,7 @@ public class UsuarioService {
             u.setNombre(detalles.getNombre());
             u.setEmail(detalles.getEmail());
             if (detalles.getPassword() != null && !detalles.getPassword().isEmpty()) {
-                u.setPassword(detalles.getPassword());
+                u.setPassword(passwordEncoder.encode(detalles.getPassword()));
             }
             if (detalles.getRol() != null) {
                 u.setRol(detalles.getRol());

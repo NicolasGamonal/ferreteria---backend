@@ -8,6 +8,7 @@ import duoc.cl.ferreteria.repository.ProductoRepository;
 import duoc.cl.ferreteria.repository.UsuarioRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 
@@ -17,13 +18,16 @@ public class DataInitializer implements CommandLineRunner {
     private final UsuarioRepository usuarioRepository;
     private final ProductoRepository productoRepository;
     private final CuentaCorrienteRepository cuentaCorrienteRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public DataInitializer(UsuarioRepository usuarioRepository,
                            ProductoRepository productoRepository,
-                           CuentaCorrienteRepository cuentaCorrienteRepository) {
+                           CuentaCorrienteRepository cuentaCorrienteRepository,
+                           PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.productoRepository = productoRepository;
         this.cuentaCorrienteRepository = cuentaCorrienteRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -32,21 +36,21 @@ public class DataInitializer implements CommandLineRunner {
             Usuario admin = new Usuario();
             admin.setNombre("Admin Principal");
             admin.setEmail("admin@losmaestros.cl");
-            admin.setPassword("123");
+            admin.setPassword(passwordEncoder.encode("123"));
             admin.setRol("Administrador");
             admin.setActivo(true);
 
             Usuario vendedor = new Usuario();
             vendedor.setNombre("Carlos Vendedor");
             vendedor.setEmail("ventas@losmaestros.cl");
-            vendedor.setPassword("123");
+            vendedor.setPassword(passwordEncoder.encode("123"));
             vendedor.setRol("Vendedor");
             vendedor.setActivo(true);
 
             Usuario cliente = new Usuario();
             cliente.setNombre("Juan Pérez");
             cliente.setEmail("cliente@gmail.com");
-            cliente.setPassword("123");
+            cliente.setPassword(passwordEncoder.encode("123"));
             cliente.setRol("Cliente");
             cliente.setActivo(true);
 
